@@ -1,41 +1,90 @@
 #include "sort.h"
 
-/**
-*swap - the positions of two elements into an array
-*@array: array
-*@item1: array element
-*@item2: array element
-*/
-void swap(int *array, int item1, int item2)
-{
+int swap_nodes(listint_t **list, listint_t *node1, listint_t *node2);
 
-	int tmp;
-
-	tmp = array[item1];
-	array[item1] = array[item2];
-	array[item2] = tmp;
-}
 /**
- * shell_sort - function that sorts an array of integers in ascending
- * order using the Shell sort algorithm, using the Knuth sequence
- * @size: size of the array
- * @array: list with numbers
+ * cocktail_sort_list - Swaps the nodes of d-linkedlist
+ * @list: head pointer
  */
-void shell_sort(int *array, size_t size)
+void cocktail_sort_list(listint_t **list)
 {
-	size_t gap = 1, i, index = 0;
+	int swapped;
+	listint_t *start = NULL;
+	listint_t *end = NULL, *current = NULL;
 
-	if (array == NULL || size < 2)
+	if (list == NULL || *list == NULL || (*list)->next == NULL)
 		return;
-	while (gap < size / 3)
-		gap = 3 * gap + 1;
-	while (gap >= 1)
+
+	do
+
 	{
-		for (i = gap; i < size; i++)
-			for (index = i; index >= gap &&
-			 (array[index] < array[index - gap]); index -= gap)
-				swap(array, index, index - gap);
-		print_array(array, size);
-		gap /= 3;
-	}
+		swapped = 0;
+		current = *list;
+		while (current->next != end && current->next != NULL)
+		{
+			if (current->n > current->next->n)
+			{
+				if (current == *list)
+					*list = current->next;
+
+				swapped = 1;
+				current = current->next;
+				swap_nodes(list, current->prev, current);
+				print_list(*list);
+			}
+			else
+			{
+				current = current->next;
+			}
+		}
+		end = current;
+
+		if (!swapped)
+			break;
+
+		swapped = 0;
+
+		current = current->prev;
+		while (current->prev != start && current->prev != NULL)
+		{
+			if (current->n < current->prev->n)
+			{
+				current = current->prev;
+				swapped = swap_nodes(list, current, current->next);
+				print_list(*list);
+			}
+			else
+			{
+				current = current->prev;
+			}
+		}
+		start = current->next;
+	} while (swapped);
+}
+
+/**
+ * swap_nodes - Swaps the nodes of d-linkedlist
+ * @list: head pointer
+ * @n1: node1 pointer
+ * @n2: node2 pointer
+ * Return: 1
+ */
+int swap_nodes(listint_t **list, listint_t *n1, listint_t *n2)
+{
+	n1->next = n2->next;
+
+	if (n2->next != NULL)
+		n2->next->prev = n1;
+
+	n2->next = n1;
+	n2->prev = n1->prev;
+
+	if (n1->prev != NULL)
+		n1->prev->next = n2;
+	else
+		*list = n2;
+
+	n1->prev = n2;
+
+	return (1);
 }
